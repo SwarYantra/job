@@ -104,6 +104,7 @@ else if(isset($_POST['opening_id'],$_POST['encoded_string']))
     $mapper = new JsonMapper();
     $writtenTest = $mapper->map($obj, new WrittenTest());
     foreach ($writtenTest->writtenTest->writtenTestList as &$testList){
+        $testList->openingId=$opening_id;
         foreach ($testList->sectionList as &$sectionListUpd){
             $sectionListUpd->attemptCount=$_POST[$sectionListUpd->id."_attempt_count"];
             $sectionListUpd->totalTime=$_POST[$sectionListUpd->id."_total_time"];

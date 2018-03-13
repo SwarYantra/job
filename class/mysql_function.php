@@ -127,7 +127,7 @@ class database
 					$a_params[] = & $value[$i];
 				}
 
-                file_put_contents('php://stderr', print_r($a_params,true));
+                file_put_contents('php://stderr',"\nThe Parameters are: ".print_r($a_params,true));
 
 				//binding value to the function
 				call_user_func_array(array($stmt,'bind_param'),$a_params);

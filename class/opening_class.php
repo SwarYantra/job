@@ -20,6 +20,7 @@ class Opening
     private $location;
     private $salaryMax;
     private $salaryMin;
+    private $status;
     private $createDate;
     private $industryType;
     private $applicationStartDate;
@@ -34,6 +35,22 @@ class Opening
     private $requiredDocumentList;
     private $writtenTest;
 
+
+    /**
+     * @return mixed
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param mixed $status
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+    }
     /**
      * @return mixed
      */
@@ -407,19 +424,31 @@ class Opening
         //connection made
         $db->connect();
 
+        $result = array();
         $where = array();
         $value = array();
         $type = '';
         $table = 'opening';
 
-        $result = array();
+        if(!empty($this->openingId)){
+            $where[count($where)] = 'opening_id';
+            $value[count($value)] = $this->openingId;
+            $type .= 'i';
+        }
+        if (!empty($this->status)) {
+            $where[count($where)] = 'status';
+            $value[count($value)] = $this->status;
+            $type .= 's';
+        }
 
         file_put_contents('php://stderr', "\nSelect");
-        file_put_contents('php://stderr', "\nThis is where" . print_r($where, true));
-        file_put_contents('php://stderr', "\nThis is value" . print_r($value, true));
-        file_put_contents('php://stderr', "\nThis is type" . print_r($type, true));
+        file_put_contents('php://stderr', "\nThis is where "  . print_r($where, true));
+        file_put_contents('php://stderr', "\nThis is value " . print_r($value, true));
+        file_put_contents('php://stderr', "\nThis is type  " . print_r($type, true));
 
         $db->select($table, '*', $where, $value, $type);///We have to use Prepared Query Here...
+        $result = $db->result;
+        return $result;
         $db->disconnect();
     }
 
@@ -489,8 +518,14 @@ class Opening
             if (isset($result[$i]['salary_min'])) {
                 $opening->setSalaryMin($result[$i]['salary_min']);
             }
-            if(isset($result[$i]['required_documents'])){
+            if (isset($result[$i]['required_documents'])) {
                 $opening->setRequiredDocumentList($result[$i]['required_documents']);
+            }
+            if (isset($result[$i]['status'])) {
+                $opening->setStatus($result[$i]['status']);
+            }
+            if (isset($result[$i]['written_test'])) {
+                $opening->setWrittenTest($result[$i]['written_test']);
             }
             $openingList[] = $opening;
         }
@@ -534,36 +569,46 @@ class Opening
             $this->setFunctionalArea($obj->functionalArea);
         if (!empty($obj->referenceCode))
             $this->setReferenceCode($obj->referenceCode);
-        if(!empty($obj->requiredDocumentList))
+        if (!empty($obj->requiredDocumentList))
             $this->setRequiredDocumentList($obj->requiredDocumentList);
+        if(!empty($obj->status))
+            $this->setStatus($obj->status);
+        if(!empty($obj->writtenTest))
+            $this->setWrittenTest($obj->writtenTest);
     }
 
-    function update($db){
+    function update($db)
+    {
         $db->connect();
-        $table='opening';
-        $rows=array();
-        $values=array();
-        $where='';
-        $type='';
+        $table = 'opening';
+        $rows = array();
+        $values = array();
+        $where = '';
+        $type = '';
 
-        if(!empty($this->writtenTest)){
-            $rows[count($rows)]='written_test';
-            $values[count($values)]=$this->writtenTest;
-            $type.='s';
+        if(!empty($this->status)){
+            $rows[count($rows)] = 'status';
+            $values[count($values)] = $this->status;
+            $type .= 's';
         }
 
-        $where="opening_id=".$this->openingId;
-        file_put_contents('php://stderr',"This is table:".$table);
-        file_put_contents('php://stderr',"This is rows:".print_r($rows,true));
-        file_put_contents('php://stderr',"This is values:".print_r($values,true));
-        file_put_contents('php://stderr',"This is type:".$type);
-        file_put_contents('php://stderr',"This is where:".$where);
+        if (!empty($this->writtenTest)) {
+            $rows[count($rows)] = 'written_test';
+            $values[count($values)] = $this->writtenTest;
+            $type .= 's';
+        }
 
-        $db->update($table,$rows,$values,$where,$type);
+        $where = "opening_id=" . $this->openingId;
+        file_put_contents('php://stderr', "This is table:" . $table);
+        file_put_contents('php://stderr', "This is rows:" . print_r($rows, true));
+        file_put_contents('php://stderr', "This is values:" . print_r($values, true));
+        file_put_contents('php://stderr', "This is type:" . $type);
+        file_put_contents('php://stderr', "This is where:" . $where);
+
+        $db->update($table, $rows, $values, $where, $type);
         $db->disconnect();
-
-
     }
+
     function getJsonData()
     {
         $var = get_object_vars($this);
